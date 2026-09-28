@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server";
+import { retainInteraction, type ProspectContext } from "@/lib/hindsight";
+export async function POST(request: Request) { const { prospect, draft, outcome } = (await request.json()) as { prospect: ProspectContext; draft: string; outcome: string }; await retainInteraction(prospect, `${outcome}\nDraft: ${draft}`).catch(() => undefined); return NextResponse.json({ ok: true, persisted: Boolean(process.env.HINDSIGHT_API_KEY) }); }

@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server";
+import { reflectStrategy } from "@/lib/hindsight";
+export async function GET() { const strategy = await reflectStrategy().catch(() => null); return NextResponse.json({ strategy: strategy || "Engineering leaders respond to concrete velocity wins. Keep leading with release coordination, not generic cost savings.", persisted: Boolean(process.env.HINDSIGHT_API_KEY) }); }

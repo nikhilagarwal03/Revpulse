@@ -1,0 +1,7 @@
+export type ProspectContext = { name: string; title: string; company: string };
+const HINDSIGHT_URL = "https://api.hindsight.vectorize.io";
+const headers = () => ({ "Content-Type": "application/json", Authorization: `Bearer ${process.env.HINDSIGHT_API_KEY || ""}` });
+async function hindsightRequest(path: string, body: unknown) { if (!process.env.HINDSIGHT_API_KEY) return null; const response = await fetch(`${HINDSIGHT_URL}${path}`, { method: "POST", headers: headers(), body: JSON.stringify(body), cache: "no-store" }); if (!response.ok) throw new Error(`Hindsight request failed: ${response.status}`); return response.json(); }
+export async function retainInteraction(prospectContext: ProspectContext, outcome: string) { return hindsightRequest("/v1/retain", { content: `Prospect: ${prospectContext.name}, ${prospectContext.title} at ${prospectContext.company}. Outcome: ${outcome}`, metadata: { source: "revpulse", title: prospectContext.title, outcome } }); }
+export async function recallContext(prospectPersona: string) { const result = await hindsightRequest("/v1/recall", { query: `What messaging works for a ${prospectPersona}? Include successful hooks and objections.`, budget: "mid" }); return result?.results || result?.memories || []; }
+export async function reflectStrategy() { const result = await hindsightRequest("/v1/reflect", { query: "Reflect on outbound campaign outcomes from the last 30 days and summarize the current sales playbook." }); return result?.text || result?.summary || null; }
